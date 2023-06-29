@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:new_app/data/categories.dart';
 import 'package:new_app/models/grocery_item.dart';
 import 'package:new_app/widgets/new_item.dart';
+import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 
 class GroceryList extends StatefulWidget {
@@ -73,8 +74,24 @@ class _GroceryListState extends State<GroceryList> {
     if (newItem == null) {
       return;
     }
+
+    var foundIndex = _groceryItems.indexWhere(
+      (item) => item.name.toLowerCase() == newItem.name.toLowerCase() && item.category == newItem.category,
+    );
+
     setState(() {
-      _groceryItems.add(newItem);
+      if (foundIndex != -1) {
+        // Replace the found item with a new one with incremented quantity
+        _groceryItems[foundIndex] = GroceryItem(
+          id: _groceryItems[foundIndex].id,
+          name: _groceryItems[foundIndex].name,
+          category: _groceryItems[foundIndex].category,
+          quantity: _groceryItems[foundIndex].quantity + newItem.quantity,
+        );
+      } else {
+        // Add the new item to the list
+        _groceryItems.add(newItem);
+      }
     });
   }
 
@@ -114,8 +131,34 @@ class _GroceryListState extends State<GroceryList> {
               height: 24,
               color: _groceryItems[index].category.color,
             ),
-            trailing: Text(_groceryItems[index].quantity.toString()),
+            trailing: Row(
+              mainAxisSize: MainAxisSize
+                  .min, // make the Row take minimum horizontal space
+              children: [
+                Text(_groceryItems[index]
+                    .quantity
+                    .toString()), // display item quantity
+                IconButton(
+                  // add IconButton
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    _removeItem(
+                        _groceryItems[index]); // call the remove item function
+                  },
+                ),
+              ],
+            ),
           ),
+
+          /* child: ListTile(
+            title: Text(_groceryItems[index].name),
+            leading: Container(
+              width: 24,
+              height: 24,
+              color: _groceryItems[index].category.color,
+            ),
+            trailing: Text(_groceryItems[index].quantity.toString()),
+          ), */
         ),
         itemCount: _groceryItems.length,
       );
