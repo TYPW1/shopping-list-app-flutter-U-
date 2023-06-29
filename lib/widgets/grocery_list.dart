@@ -114,8 +114,34 @@ class _GroceryListState extends State<GroceryList> {
               height: 24,
               color: _groceryItems[index].category.color,
             ),
-            trailing: Text(_groceryItems[index].quantity.toString()),
+            trailing: Row(
+              mainAxisSize: MainAxisSize
+                  .min, // make the Row take minimum horizontal space
+              children: [
+                Text(_groceryItems[index]
+                    .quantity
+                    .toString()), // display item quantity
+                IconButton(
+                  // add IconButton
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    _removeItem(
+                        _groceryItems[index]); // call the remove item function
+                  },
+                ),
+              ],
+            ),
           ),
+
+          /* child: ListTile(
+            title: Text(_groceryItems[index].name),
+            leading: Container(
+              width: 24,
+              height: 24,
+              color: _groceryItems[index].category.color,
+            ),
+            trailing: Text(_groceryItems[index].quantity.toString()),
+          ), */
         ),
         itemCount: _groceryItems.length,
       );
