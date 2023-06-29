@@ -2,8 +2,8 @@
 
 Welcome to the Flutter Shopping List App repository! This project is a Flutter application that allows users to manage their shopping list. The app uses Firebase for backend services.
 
-![App UI](/path/to/Screenshot1.jpg)
-![App UI](/path/to/Screenshot2.jpg)
+![App UI](/path/to/Screenshot1.png)
+![App UI](/path/to/Screenshot2.png)
 
 ## Features
 
