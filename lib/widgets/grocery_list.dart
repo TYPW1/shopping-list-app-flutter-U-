@@ -76,7 +76,7 @@ class _GroceryListState extends State<GroceryList> {
     }
 
     var foundIndex = _groceryItems.indexWhere(
-      (item) => item.name == newItem.name && item.category == newItem.category,
+      (item) => item.name.toLowerCase() == newItem.name.toLowerCase() && item.category == newItem.category,
     );
 
     setState(() {
