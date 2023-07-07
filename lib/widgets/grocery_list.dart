@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:new_app/data/categories.dart';
 import 'package:new_app/models/grocery_item.dart';
 import 'package:new_app/widgets/new_item.dart';
-import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 
 class GroceryList extends StatefulWidget {
@@ -76,7 +75,9 @@ class _GroceryListState extends State<GroceryList> {
     }
 
     var foundIndex = _groceryItems.indexWhere(
-      (item) => item.name.toLowerCase() == newItem.name.toLowerCase() && item.category == newItem.category,
+      (item) =>
+          item.name.toLowerCase() == newItem.name.toLowerCase() &&
+          item.category == newItem.category,
     );
 
     setState(() {
@@ -126,11 +127,10 @@ class _GroceryListState extends State<GroceryList> {
           key: ValueKey(_groceryItems[index].id),
           child: ListTile(
             title: Text(_groceryItems[index].name),
-            leading: Container(
-              width: 24,
-              height: 24,
-              color: _groceryItems[index].category.color,
-            ),
+            leading: Image.asset(
+                'assets/icons/${_groceryItems[index].category.title.toLowerCase()}.png',
+                width: 24,
+                height: 24), // load the corresponding icon
             trailing: Row(
               mainAxisSize: MainAxisSize
                   .min, // make the Row take minimum horizontal space
@@ -140,7 +140,7 @@ class _GroceryListState extends State<GroceryList> {
                     .toString()), // display item quantity
                 IconButton(
                   // add IconButton
-                  icon: Icon(Icons.delete),
+                  icon: const Icon(Icons.delete),
                   onPressed: () {
                     _removeItem(
                         _groceryItems[index]); // call the remove item function
