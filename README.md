@@ -26,7 +26,7 @@ For help getting started with Flutter, view the [online documentation](https://f
 1. Clone the repository: `git clone https://github.com/TYPW1/shopping-list-app-flutter-U-.git`
 2. Install Flutter: Follow the instructions [here](https://flutter.dev/docs/get-started/install).
 3. Get the packages: Run `flutter pub get` in the project directory.
-4. Run the app: `flutter run`
+4. Run the app: `flutter run -d web-server`
 
 ## App Structure
 
