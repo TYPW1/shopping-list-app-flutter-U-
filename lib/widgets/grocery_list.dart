@@ -6,6 +6,8 @@ import 'package:new_app/models/grocery_item.dart';
 import 'package:new_app/widgets/new_item.dart';
 import 'package:new_app/widgets/search_delegate.dart';
 import 'package:http/http.dart' as http;
+import 'package:new_app/providers/authentication_provider.dart';
+import 'package:provider/provider.dart';
 
 enum SortOptions {
   name,
@@ -243,6 +245,15 @@ class _GroceryListState extends State<GroceryList> {
       appBar: AppBar(
         title: const Text("Your Groceries"),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.logout), // use the logout icon
+            onPressed: () {
+              // call the signOut method from the AuthenticationProvider
+              final authProvider =
+                  Provider.of<AuthenticationProvider>(context, listen: false);
+              authProvider.signOut();
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () async {
