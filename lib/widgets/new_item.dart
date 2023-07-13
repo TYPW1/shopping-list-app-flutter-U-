@@ -16,6 +16,9 @@ class _NewItemState extends State<NewItem> {
   final _formKey = GlobalKey<FormState>();
   var _enteredName = '';
   double _enteredQty = 1;
+  var _enteredDescription = ''; // New variable
+  double _enteredPrice = 0.0; // New variable
+  bool _isPurchased = false; // New variable
   var _selectedCategory = categories[Categories.vegetables]!;
   var _isSending = false;
 
@@ -33,8 +36,11 @@ class _NewItemState extends State<NewItem> {
           },
           body: jsonEncode({
             'name': _enteredName,
-            'quantity': _enteredQty.toInt(), // Change this line
+            'quantity': _enteredQty.toInt(),
             'category': _selectedCategory.title,
+            'description': _enteredDescription, // New field
+            'price': _enteredPrice, // New field
+            'isPurchased': _isPurchased, // New field
           }));
 
       final Map<String, dynamic> resData = json.decode(response.body);
@@ -47,6 +53,9 @@ class _NewItemState extends State<NewItem> {
         name: _enteredName,
         quantity: _enteredQty.toInt(),
         category: _selectedCategory,
+        description: _enteredDescription, // New field
+        price: _enteredPrice, // New field
+        isPurchased: _isPurchased, // New field
       ));
     }
   }
@@ -81,12 +90,52 @@ class _NewItemState extends State<NewItem> {
                   _enteredName = newValue!;
                 },
               ),
+              TextFormField(
+                decoration: const InputDecoration(
+                  label: Text("Description"),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().length > 100) {
+                    return 'Must be less than 100 characters.';
+                  }
+                  return null;
+                },
+                onSaved: (newValue) {
+                  _enteredDescription = newValue!;
+                },
+              ),
+              TextFormField(
+                keyboardType: const TextInputType.numberWithOptions(
+                    decimal: false),
+                decoration: const InputDecoration(label: Text('Price')),
+                validator: (value) {
+                  if (value == null ||
+                      value.isEmpty ||
+                      int.tryParse(value) == null ||
+                      int.parse(value) < 0) {
+                    return 'Must be a valid non-negative integer.';
+                  }
+                  return null;
+                },
+                onSaved: (newValue) {
+                  _enteredPrice = double.parse(
+                      newValue!);
+                },
+              ),
+              CheckboxListTile(
+                title: const Text('Purchased'),
+                value: _isPurchased,
+                onChanged: (newValue) {
+                  setState(() {
+                    _isPurchased = newValue!;
+                  });
+                },
+              ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
                     child: Column(
-                      // Add this
                       children: [
                         Text('Quantity: ${_enteredQty.round()}'),
                         Slider(
@@ -155,6 +204,11 @@ class _NewItemState extends State<NewItem> {
                                 _enteredQty = 1; // Reset the quantity slider
                                 _selectedCategory = categories[Categories
                                     .vegetables]!; // Reset the category dropdown
+                                _enteredDescription =
+                                    ''; // Reset the description field
+                                _enteredPrice = 0.0; // Reset the price field
+                                _isPurchased =
+                                    false; // Reset the purchased status
                               });
                             },
                       child: const Text("Reset")),

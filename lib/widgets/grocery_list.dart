@@ -52,6 +52,9 @@ class _GroceryListState extends State<GroceryList> {
           name: item.value["name"],
           quantity: item.value["quantity"],
           category: category,
+          description: item.value["description"], // New field
+          price: item.value["price"], // New field
+          isPurchased: item.value["isPurchased"], // New field
         ));
       }
       setState(() {
@@ -126,7 +129,17 @@ class _GroceryListState extends State<GroceryList> {
           },
           key: ValueKey(_groceryItems[index].id),
           child: ListTile(
-            title: Text(_groceryItems[index].name),
+            title: Text(
+              _groceryItems[index].name,
+              style: TextStyle(
+                decoration: _groceryItems[index].isPurchased
+                    ? TextDecoration.lineThrough
+                    : null,
+              ),
+            ),
+            subtitle: Text(
+              '${_groceryItems[index].description}\nPrice:${_groceryItems[index].price.toStringAsFixed(2)} FCFA',
+            ),
             leading: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Image.asset(
@@ -136,33 +149,18 @@ class _GroceryListState extends State<GroceryList> {
               ),
             ),
             trailing: Row(
-              mainAxisSize: MainAxisSize
-                  .min, // make the Row take minimum horizontal space
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(_groceryItems[index]
-                    .quantity
-                    .toString()), // display item quantity
+                Text(_groceryItems[index].quantity.toString()),
                 IconButton(
-                  // add IconButton
                   icon: const Icon(Icons.delete),
                   onPressed: () {
-                    _removeItem(
-                        _groceryItems[index]); // call the remove item function
+                    _removeItem(_groceryItems[index]);
                   },
                 ),
               ],
             ),
           ),
-
-          /* child: ListTile(
-            title: Text(_groceryItems[index].name),
-            leading: Container(
-              width: 24,
-              height: 24,
-              color: _groceryItems[index].category.color,
-            ),
-            trailing: Text(_groceryItems[index].quantity.toString()),
-          ), */
         ),
         itemCount: _groceryItems.length,
       );
