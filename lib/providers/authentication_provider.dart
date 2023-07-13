@@ -3,7 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
-class AuthenticationProvider with ChangeNotifier {
+class AuthenticationProvider with ChangeNotifier  {
   final FirebaseAuth _firebaseAuth;
 
   AuthenticationProvider(this._firebaseAuth);
@@ -14,16 +14,14 @@ class AuthenticationProvider with ChangeNotifier {
   }
 
   // Sign In Method
-  Future<void> signIn(String email, String password) async {
-    try {
-      await _firebaseAuth.signInWithEmailAndPassword(
-          email: email, password: password);
-      notifyListeners(); // Notify listeners when sign in status changes
-    } on FirebaseAuthException catch (e) {
-      // handle error
-      // ignore: avoid_print
-      print(e);
-    }
+ Future<String?> signIn(String email, String password) async {
+  try {
+    await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+    notifyListeners(); // Notify listeners when sign in status changes
+    return null;
+  } on FirebaseAuthException catch (e) {
+    return e.message; // Return the error message
+  }
   }
 
   // Sign Out Method
@@ -33,15 +31,13 @@ class AuthenticationProvider with ChangeNotifier {
   }
 
 // Create Account Method
-  Future<void> createAccount(String email, String password) async {
-    try {
-      await _firebaseAuth.createUserWithEmailAndPassword(
-          email: email, password: password);
-      notifyListeners(); // Notify listeners when sign in status changes
-    } on FirebaseAuthException catch (e) {
-      // handle error
-      print('Error code: ${e.code}');
-      print('Error message: ${e.message}');
-    }
+Future<String?> createAccount(String email, String password) async {
+  try {
+    await _firebaseAuth.createUserWithEmailAndPassword(email: email, password: password);
+    notifyListeners(); // Notify listeners when account is created
+    return null;
+  } on FirebaseAuthException catch (e) {
+    return e.message; // Return the error message
   }
+}
 }

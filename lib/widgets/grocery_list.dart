@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:new_app/data/categories.dart';
 import 'package:new_app/models/grocery_item.dart';
@@ -51,6 +52,7 @@ class _GroceryListState extends State<GroceryList> {
   }
 
   void _loadItems() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
     final url = Uri.https(
         'flutter-prep-5c57d-default-rtdb.firebaseio.com', 'shopping-list.json');
     try {
@@ -130,9 +132,9 @@ class _GroceryListState extends State<GroceryList> {
     setState(() {
       _groceryItems.remove(item);
     });
-
+    final userId = FirebaseAuth.instance.currentUser!.uid;
     final url = Uri.https('flutter-prep-5c57d-default-rtdb.firebaseio.com',
-        'shopping-list/${item.id}.json');
+        'shopping-list.json');
 
     final response = await http.delete(url);
     if (response.statusCode >= 400) {

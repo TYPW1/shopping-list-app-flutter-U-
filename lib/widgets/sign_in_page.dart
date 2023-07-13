@@ -18,13 +18,23 @@ class _SignInPageState extends State<SignInPage> {
   String _email = '';
   String _password = '';
 
-  void _submit() {
+  void _submit() async {
     if (_formKey.currentState?.validate() ?? false) {
       _formKey.currentState?.save();
 
       final authProvider =
           Provider.of<AuthenticationProvider>(context, listen: false);
-      authProvider.signIn(_email, _password);
+
+      String? errorMsg = await authProvider.signIn(_email, _password);
+
+      if (errorMsg != null) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(errorMsg)));
+      } else {
+        // No need to manually navigate to the user's space.
+        // The Consumer<AuthenticationProvider> widget in main.dart will automatically update the home page.
+      }
     }
   }
 
@@ -59,7 +69,8 @@ class _SignInPageState extends State<SignInPage> {
               ),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const CreateAccountPage()),
+                  MaterialPageRoute(
+                      builder: (context) => const CreateAccountPage()),
                 ),
                 child: const Text('Create Account'),
               ),
