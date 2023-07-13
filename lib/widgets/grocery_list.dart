@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:new_app/data/categories.dart';
 import 'package:new_app/models/grocery_item.dart';
 import 'package:new_app/widgets/new_item.dart';
+import 'package:new_app/widgets/search_delegate.dart';
 import 'package:http/http.dart' as http;
 
 class GroceryList extends StatefulWidget {
@@ -116,6 +117,8 @@ class _GroceryListState extends State<GroceryList> {
     }
   }
 
+  GroceryItem? _selectedItem;
+
   @override
   Widget build(BuildContext context) {
     Widget content = const Center(
@@ -123,6 +126,7 @@ class _GroceryListState extends State<GroceryList> {
     );
     if (_groceryItems.isNotEmpty) {
       content = ListView.builder(
+        itemCount: _groceryItems.length, 
         itemBuilder: (context, index) => Dismissible(
           onDismissed: (direction) {
             _removeItem(_groceryItems[index]);
@@ -137,6 +141,7 @@ class _GroceryListState extends State<GroceryList> {
                     : null,
               ),
             ),
+            tileColor: _groceryItems[index] == _selectedItem ? Colors.yellow : null, // Highlight the selected item
             subtitle: Text(
               '${_groceryItems[index].description}\nPrice:${_groceryItems[index].price.toStringAsFixed(2)} FCFA',
             ),
@@ -162,7 +167,6 @@ class _GroceryListState extends State<GroceryList> {
             ),
           ),
         ),
-        itemCount: _groceryItems.length,
       );
     }
     if (_isLoading) {
@@ -179,7 +183,21 @@ class _GroceryListState extends State<GroceryList> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Your Groceries"),
-        actions: [IconButton(onPressed: _addItem, icon: const Icon(Icons.add))],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () async {
+              final selectedItem = await showSearch(
+                context: context,
+                delegate: DataSearch(_groceryItems),
+              );
+              setState(() {
+                _selectedItem = selectedItem;
+              });
+            },
+          ),
+          IconButton(onPressed: _addItem, icon: const Icon(Icons.add)),
+        ],
       ),
       body: content,
     );
