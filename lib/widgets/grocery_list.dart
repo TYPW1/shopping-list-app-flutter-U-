@@ -7,6 +7,27 @@ import 'package:new_app/widgets/new_item.dart';
 import 'package:new_app/widgets/search_delegate.dart';
 import 'package:http/http.dart' as http;
 
+enum SortOptions {
+  name,
+  quantity,
+  category,
+  purchasedStatus,
+}
+
+enum FilterOptions {
+  all,
+  vegetables,
+  fruits,
+  meat,
+  dairy,
+  carbs,
+  sweets,
+  spices,
+  convenience,
+  hygiene,
+  others,
+}
+
 class GroceryList extends StatefulWidget {
   const GroceryList({super.key});
 
@@ -18,6 +39,8 @@ class _GroceryListState extends State<GroceryList> {
   List<GroceryItem> _groceryItems = [];
   var _isLoading = true;
   String? _error;
+  SortOptions _sortOption = SortOptions.name;
+  FilterOptions _filterOption = FilterOptions.all;
 
   @override
   void initState() {
@@ -117,6 +140,40 @@ class _GroceryListState extends State<GroceryList> {
     }
   }
 
+  void _sortList() {
+    setState(() {
+      switch (_sortOption) {
+        case SortOptions.name:
+          _groceryItems.sort((a, b) => a.name.compareTo(b.name));
+          break;
+        case SortOptions.quantity:
+          _groceryItems.sort((a, b) => a.quantity.compareTo(b.quantity));
+          break;
+        case SortOptions.category:
+          _groceryItems
+              .sort((a, b) => a.category.title.compareTo(b.category.title));
+          break;
+        case SortOptions.purchasedStatus:
+          _groceryItems.sort((a, b) =>
+              (a.isPurchased ? 1 : 0).compareTo(b.isPurchased ? 1 : 0));
+          break;
+      }
+    });
+  }
+
+  void _filterList() {
+    setState(() {
+      if (_filterOption == FilterOptions.all) {
+        _loadItems();
+      } else {
+        _groceryItems = _groceryItems.where((item) {
+          return item.category.title.toLowerCase() ==
+              _filterOption.toString().split('.').last;
+        }).toList();
+      }
+    });
+  }
+
   GroceryItem? _selectedItem;
 
   @override
@@ -126,7 +183,7 @@ class _GroceryListState extends State<GroceryList> {
     );
     if (_groceryItems.isNotEmpty) {
       content = ListView.builder(
-        itemCount: _groceryItems.length, 
+        itemCount: _groceryItems.length,
         itemBuilder: (context, index) => Dismissible(
           onDismissed: (direction) {
             _removeItem(_groceryItems[index]);
@@ -141,7 +198,9 @@ class _GroceryListState extends State<GroceryList> {
                     : null,
               ),
             ),
-            tileColor: _groceryItems[index] == _selectedItem ? Colors.yellow : null, // Highlight the selected item
+            tileColor: _groceryItems[index] == _selectedItem
+                ? Colors.yellow
+                : null, // Highlight the selected item
             subtitle: Text(
               '${_groceryItems[index].description}\nPrice:${_groceryItems[index].price.toStringAsFixed(2)} FCFA',
             ),
@@ -195,6 +254,53 @@ class _GroceryListState extends State<GroceryList> {
                 _selectedItem = selectedItem;
               });
             },
+          ),
+          DropdownButton<SortOptions>(
+            value: _sortOption,
+            onChanged: (SortOptions? newValue) {
+              if (newValue != null) {
+                setState(() {
+                  _sortOption = newValue;
+                });
+                _sortList();
+              }
+            },
+            items: const <DropdownMenuItem<SortOptions>>[
+              DropdownMenuItem<SortOptions>(
+                value: SortOptions.name,
+                child: Text('Sort by Name'),
+              ),
+              DropdownMenuItem<SortOptions>(
+                value: SortOptions.quantity,
+                child: Text('Sort by Quantity'),
+              ),
+              DropdownMenuItem<SortOptions>(
+                value: SortOptions.category,
+                child: Text('Sort by Category'),
+              ),
+              DropdownMenuItem<SortOptions>(
+                value: SortOptions.purchasedStatus,
+                child: Text('Sort by Purchased Status'),
+              ),
+            ],
+          ),
+          DropdownButton<FilterOptions>(
+            value: _filterOption,
+            onChanged: (FilterOptions? newValue) {
+              if (newValue != null) {
+                setState(() {
+                  _filterOption = newValue;
+                });
+                _filterList();
+              }
+            },
+            items: FilterOptions.values.map((FilterOptions filterOption) {
+              return DropdownMenuItem<FilterOptions>(
+                value: filterOption,
+                child: Text(
+                    'Filter by ${filterOption.toString().split('.').last}'),
+              );
+            }).toList(),
           ),
           IconButton(onPressed: _addItem, icon: const Icon(Icons.add)),
         ],
