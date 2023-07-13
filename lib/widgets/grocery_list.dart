@@ -127,10 +127,14 @@ class _GroceryListState extends State<GroceryList> {
           key: ValueKey(_groceryItems[index].id),
           child: ListTile(
             title: Text(_groceryItems[index].name),
-            leading: Image.asset(
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.asset(
                 'assets/icons/${_groceryItems[index].category.title.toLowerCase()}.png',
                 width: 24,
-                height: 24), // load the corresponding icon
+                height: 24,
+              ),
+            ),
             trailing: Row(
               mainAxisSize: MainAxisSize
                   .min, // make the Row take minimum horizontal space

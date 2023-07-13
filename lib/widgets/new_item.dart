@@ -15,7 +15,7 @@ class NewItem extends StatefulWidget {
 class _NewItemState extends State<NewItem> {
   final _formKey = GlobalKey<FormState>();
   var _enteredName = '';
-  var _enteredQty = 1;
+  double _enteredQty = 1;
   var _selectedCategory = categories[Categories.vegetables]!;
   var _isSending = false;
 
@@ -33,7 +33,7 @@ class _NewItemState extends State<NewItem> {
           },
           body: jsonEncode({
             'name': _enteredName,
-            'quantity': _enteredQty,
+            'quantity': _enteredQty.toInt(), // Change this line
             'category': _selectedCategory.title,
           }));
 
@@ -45,16 +45,9 @@ class _NewItemState extends State<NewItem> {
       Navigator.of(context).pop(GroceryItem(
         id: resData['name'],
         name: _enteredName,
-        quantity: _enteredQty,
+        quantity: _enteredQty.toInt(),
         category: _selectedCategory,
       ));
-
-      // Navigator.of(context).pop(GroceryItem(
-      //   id: DateTime.now().toString(),
-      //   name: _enteredName,
-      //   quantity: _enteredQty,
-      //   category: _selectedCategory,
-      // ));
     }
   }
 
@@ -80,7 +73,7 @@ class _NewItemState extends State<NewItem> {
                       value.isEmpty ||
                       value.trim().length == 1 ||
                       value.trim().length > 50) {
-                    return 'Must be between 1 and 50 characters.';
+                    return 'Enter an Item name';
                   }
                   return null;
                 },
@@ -92,23 +85,23 @@ class _NewItemState extends State<NewItem> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
-                    child: TextFormField(
-                      keyboardType: TextInputType.number,
-                      decoration:
-                          const InputDecoration(label: Text('Quantity')),
-                      initialValue: _enteredQty.toString(),
-                      validator: (value) {
-                        if (value == null ||
-                            value.isEmpty ||
-                            int.tryParse(value) == null ||
-                            int.tryParse(value)! <= 0) {
-                          return 'Must be a valid possitive number.';
-                        }
-                        return null;
-                      },
-                      onSaved: (newValue) {
-                        _enteredQty = int.parse(newValue!);
-                      },
+                    child: Column(
+                      // Add this
+                      children: [
+                        Text('Quantity: ${_enteredQty.round()}'),
+                        Slider(
+                          value: _enteredQty,
+                          min: 1,
+                          max: 100,
+                          divisions: 99,
+                          label: _enteredQty.round().toString(),
+                          onChanged: (double newValue) {
+                            setState(() {
+                              _enteredQty = newValue.roundToDouble();
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(
@@ -123,10 +116,13 @@ class _NewItemState extends State<NewItem> {
                               value: category.value,
                               child: Row(
                                 children: [
-                                  Container(
-                                    height: 16,
-                                    width: 16,
-                                    color: category.value.color,
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Image.asset(
+                                      'assets/icons/${category.value.title.toLowerCase()}.png',
+                                      height: 24,
+                                      width: 24,
+                                    ),
                                   ),
                                   const SizedBox(
                                     width: 6,
@@ -155,6 +151,11 @@ class _NewItemState extends State<NewItem> {
                           ? null
                           : () {
                               _formKey.currentState!.reset();
+                              setState(() {
+                                _enteredQty = 1; // Reset the quantity slider
+                                _selectedCategory = categories[Categories
+                                    .vegetables]!; // Reset the category dropdown
+                              });
                             },
                       child: const Text("Reset")),
                   ElevatedButton(
